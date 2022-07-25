@@ -1,4 +1,5 @@
 import 'package:costumerform/DBHelper.dart';
+import 'package:costumerform/first.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
@@ -44,6 +45,11 @@ class _ViewPageState extends State<ViewPage> {
 
         return ListTile(leading: Text("${m['id']}"),
         title: Text("${m['name']}"),
+          trailing: IconButton(onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+              return First("Update");
+            },));
+          }, icon: Icon(Icons.edit)),
         );
       },):Center(child: Text("No Data Found")))
     :Center(child: CircularProgressIndicator(),));

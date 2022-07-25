@@ -6,7 +6,10 @@ import 'package:sqflite/sqflite.dart';
 
 
 class First extends StatefulWidget {
-  const First({Key? key}) : super(key: key);
+  Map? map;
+  String? method;
+
+  First(this.method, {this.map});
 
   @override
   State<First> createState() => _FirstState();
@@ -35,7 +38,7 @@ class _FirstState extends State<First> {
     "Navsari",
     "Bhuj"
   ];
-  var _name,_email,_phone;
+
   TextEditingController tpassword = TextEditingController();
   TextEditingController tconfirmpassword = TextEditingController();
   TextEditingController tname = TextEditingController();
@@ -50,6 +53,14 @@ class _FirstState extends State<First> {
   @override
   void initState() {
     super.initState();
+
+    if(widget.method == "Update"){
+      tname.text = widget.map!['name'];
+      temail.text = widget.map!['email'];
+      tphone.text = widget.map!['phone'];
+      tpassword.text = widget.map!['password'];
+      tconfirmpassword.text = widget.map!['confirmpassword'];
+    }
     _passwordVisible = false;
 
     DBHelper().createDatabase().then((value) {
@@ -376,31 +387,48 @@ class _FirstState extends State<First> {
                   ElevatedButton(onPressed: () async {
                     String name = tname.text;
                     String email = temail.text;
-                    String contact = tphone.text ;
+                    String phone = tphone.text ;
                     String password = tpassword.text;
                     String confirmpassword = tconfirmpassword.text;
 
-                    String qry = "INSERT INTO Test(name,contact,email,password,confirmpassword)  VALUES('$name','$contact','$email','$password','$confirmpassword')";
-                    int id = await db!.rawInsert(qry);
-                    _validateInputs();
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(${_showSnackBar}),
-                      ),
-                    );
-                    // Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    //   return ViewPage();
-                    // },
-                    // ));
-                    print(id);
                     if(_formkey.currentState!.validate())
                     {
-                      return;
+                     if(widget.method=="Submit"){
+
+
+                       String qry = "INSERT INTO Test(name,phone,email,password,confirmpassword)  VALUES('$name','$phone','$email','$password','$confirmpassword')";
+                       int id = await db!.rawInsert(qry);
+
+                       print(id);
+
+                       Navigator.push(context, MaterialPageRoute(builder: (context) {
+                         return ViewPage();
+                       },
+                       ));
+                       if(id>0)
+                         {
+                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                              return ViewPage();
+                            },));
+                         }
+                       else {
+                         print("Not Submited! Try Again");
+                       }
+                     }else{
+                          String q="update Test set name ='$name',contact='$phone',email='$email',password='$password',confirmpassword='$confirmpassword'where id=${widget.map!['id']}";
+                          int id = await db!.rawUpdate(q);
+                          print("id=$id");
+                          if(id==1)
+                            {
+                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                                return ViewPage();
+                              },));
+                            }
+                     }
                     }else{
                       print("unsuccessfull");
                     }
-                  }, child: Text("Submit"))
+                  }, child: Text("${widget.method}"))
                 ],
               ),
             ],
@@ -423,30 +451,5 @@ class _FirstState extends State<First> {
       });
     dob.text = "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}";
   }
-  void _validateInputs() {
-    final form = _formkey.currentState;
-    if (form!.validate()) {
-      // Text forms has validated.
 
-
-
-
-
-      // Let's validate radios and checkbox
-      if (radioValue < 0) {
-        // None of the radio buttons was selected
-        _showSnackBar('Please select your gender');
-      }
-      // else if (!_termsChecked) {
-      //   // The checkbox wasn't checked
-      //   _showSnackBar("Please accept our terms");
-      // }
-      else {
-        // Every of the data in the form are valid at this point
-        form.save();
-      }
-    } else {
-      setState(() => _autoValidate = true);
-    }
-  }
 }
