@@ -6,10 +6,6 @@ import 'package:sqflite/sqflite.dart';
 
 
 class First extends StatefulWidget {
-  Map? map;
-  String? method;
-
-  First(this.method, {this.map});
 
   @override
   State<First> createState() => _FirstState();
@@ -26,9 +22,6 @@ class _FirstState extends State<First> {
 
   var select;
   int radioValue = -1;
-  bool _autoValidate = false;
-  var  _showSnackBar;
-
 
   List listitem = [
     "Surat",
@@ -54,13 +47,6 @@ class _FirstState extends State<First> {
   void initState() {
     super.initState();
 
-    if(widget.method == "Update"){
-      tname.text = widget.map!['name'];
-      temail.text = widget.map!['email'];
-      tphone.text = widget.map!['phone'];
-      tpassword.text = widget.map!['password'];
-      tconfirmpassword.text = widget.map!['confirmpassword'];
-    }
     _passwordVisible = false;
 
     DBHelper().createDatabase().then((value) {
